@@ -32,59 +32,43 @@ let score = 0; // set score to 0
 let currentQuestion = 0;
 
 function addQuestions(questions) {
-    questionTitle.textContent = questions[currentQuestion].title;
-    choicesContainer.textContent = "";
+    questionTitle.innerHTML = questions[currentQuestion].title;
+    choicesContainer.innerHTML = "";
     for (let q = 0; q < questions[currentQuestion].choices.length; q++) {
         let choice = document.createElement("button");
-        choice.textContent = questions[currentQuestion].choices[q].answer;
+        choice.innerHTML = questions[currentQuestion].choices[q].answer;
         choicesContainer.appendChild(choice);
     }
 }
 
 addQuestions(questionList);
 
-
-// }
-//-----
-// choicesContainer.addEventListener("click", function(event){
-//     if (event.target.tagName === "BUTTON") {
-//         console.log(event.target);
-//     }
-// });
-//---------
-
-
-
-
-// Add a click event listener to the choices container
 choicesContainer.addEventListener("click", function(event){
     if (event.target.tagName === "BUTTON") {
-        // event.stopPropagation();
-        // Check if the clicked button's text matches the correct answer
+        let isCorrect = false;
         for (let i = 0; i < questionList[currentQuestion].choices.length; i++) {
-            if (event.target.textContent === questionList[currentQuestion].choices[i].answer && questionList[currentQuestion].choices[i].isCorrect) {
-                score++; // Increase the score if the answer is correct
-                document.getElementById("feedback").classList.remove("hide");
-                feedbackRes.textContent = "Correct!";
+            if (event.target.innerHTML === questionList[currentQuestion].choices[i].answer && questionList[currentQuestion].choices[i].isCorrect) {
+                isCorrect = true;
                 break;
             }
-            else {
-
-                document.getElementById("feedback").classList.remove("hide");
-                feedbackRes.textContent = "Wrong!";
-
-            console.log("wrong!");
-        } 
-
         }
-        // console.log(`Score: ${score}`);
-        
+
+        if (isCorrect) {
+            score++; // Increase the score if the answer is correct
+            document.getElementById("feedback").classList.remove("hide");
+            feedbackRes.textContent = "Correct!";
+        } else {
+            document.getElementById("feedback").classList.remove("hide");
+            feedbackRes.textContent = "Wrong!";
+            console.log("Wrong");
+            secondsLeft = secondsLeft - 5;
+        }
+
         if (currentQuestion < questionList.length - 1) {
             currentQuestion++;
             addQuestions(questionList);
         } else {
-            // console.log("Quiz finished!");
-            // console.log(`Final score: ${score}`);
+            clearInterval(timerInterval);
             endMessage();
         }
     }
@@ -92,19 +76,7 @@ choicesContainer.addEventListener("click", function(event){
 
 
 
-
-
-// choicesContainer.addEventListener("click", function(event){
-// console.log(choice);
-
-// })
-
-// let selection = document.querySelector("choices");
-// choicesContainer.addEventListener("click", function(event){
-//     event.stopPropagation();
-//     console.log(choicesContainer);
-    
-// })
+let timerInterval;
 
 
 
@@ -115,14 +87,14 @@ timeCount.textContent = secondsLeft;
 //creating the function for the timer
 function countDownTimer() {
 
-    let timerInterval = setInterval(function() {
+    timerInterval = setInterval(function() {
         secondsLeft--;
         timeCount.textContent = secondsLeft;
 
         if(secondsLeft === 0) {
 
-            clearInterval(timerInterval);
-            //this will call the endMessage for the highsore
+            //this will call the endMessage for the highscore
+            
             endMessage();
         }
     }, 1000);
@@ -153,20 +125,60 @@ function endMessage(){
     document.getElementById("questions").classList.add("hide");
     document.getElementById("end-screen").classList.remove("hide");
     finalScore.textContent = score;
+    feedbackRes.textContent = "Thanks you for playing!";
 };
 
 // console.log(questionList);
+
+//Storing scores-----------------------------------------
 let saveButton = document.querySelector("#submit");
+let initials = document.querySelector("#initials");
+
 
 saveButton.addEventListener("click", function(event) {
     event.preventDefault();
-    initials = document.querySelector("#initials").value;
 
-    localStorage.setItem("Initials", initials);
-    localStorage.setItem("Score", score);
+    let initialsInput = document.getElementById("initials").value;
+    let highscores = JSON.parse(localStorage.getItem("highscores")) || [];
+    highscores.push({initials: initialsInput, score: score});
+    localStorage.setItem("highscores", JSON.stringify(highscores));
+
+
+
+    let highscoresList = document.getElementById("highscores");
+    
+    for (let i = 0; i < highscores.length; i++) {
+        let li = document.createElement("li");
+        li.textContent = `${highscores[i].initials} - ${highscores[i].score}`;
+        highscoresList.appendChild(li);
+    }
+    // let savedScore = {
+    //     initials: initials.value,
+    //     score: score
+    // };
+
+    // const myJSON = JSON.stringify(savedScore);
+    // localStorage.setItem("savedScore", myJSON);
+
+
+    // initials = document.querySelector("#initials").value;
+    // localStorage.setItem("Initials", initials);
+    // localStorage.setItem("Score", score);
+    feedbackRes.textContent = "Score submitted :))";
+
+    // console.log(savedScore);
 })
+
+
+
+
+
+
 
 // initials = document.querySelector("#initials").value;
 
 // localStorage.setItem("Initials", initials);
 // localStorage.setItem("Score", score);
+
+
+//highscores
