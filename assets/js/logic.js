@@ -4,6 +4,9 @@ let buttStart = document.querySelector("#start");
 let timeCount = document.querySelector("#time");
 let screen = document.querySelector(".wrapper");
 
+//for feedback input
+let feedbackRes = document.querySelector("#feedback");
+
 // console.log(screen);
 // console.log(screen.children[0]);
 
@@ -56,12 +59,23 @@ addQuestions(questionList);
 // Add a click event listener to the choices container
 choicesContainer.addEventListener("click", function(event){
     if (event.target.tagName === "BUTTON") {
+        // event.stopPropagation();
         // Check if the clicked button's text matches the correct answer
         for (let i = 0; i < questionList[currentQuestion].choices.length; i++) {
             if (event.target.textContent === questionList[currentQuestion].choices[i].answer && questionList[currentQuestion].choices[i].isCorrect) {
                 score++; // Increase the score if the answer is correct
+                document.getElementById("feedback").classList.remove("hide");
+                feedbackRes.textContent = "Correct!";
                 break;
             }
+            else {
+
+                document.getElementById("feedback").classList.remove("hide");
+                feedbackRes.textContent = "Wrong!";
+
+            console.log("wrong!");
+        } 
+
         }
         // console.log(`Score: ${score}`);
         
@@ -141,4 +155,18 @@ function endMessage(){
     finalScore.textContent = score;
 };
 
-console.log(questionList);
+// console.log(questionList);
+let saveButton = document.querySelector("#submit");
+
+saveButton.addEventListener("click", function(event) {
+    event.preventDefault();
+    initials = document.querySelector("#initials").value;
+
+    localStorage.setItem("Initials", initials);
+    localStorage.setItem("Score", score);
+})
+
+// initials = document.querySelector("#initials").value;
+
+// localStorage.setItem("Initials", initials);
+// localStorage.setItem("Score", score);
